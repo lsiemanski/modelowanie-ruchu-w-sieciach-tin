@@ -1,5 +1,7 @@
 from sklearn.neural_network import MLPRegressor
 from sklearn.metrics import mean_absolute_percentage_error
+from keras.models import Sequential
+from keras.layers import Dense
 import numpy as np
 
 REPEAT = 10
@@ -16,13 +18,13 @@ X_test = X[failure_time:, :]
 Y_train = Y[:failure_time, :]
 Y_test = Y[failure_time:, :]
 
-Y_train = np.ravel(Y_train)
-Y_test = np.ravel(Y_test)
+# Y_train = np.ravel(Y_train)
+# Y_test = np.ravel(Y_test)
 
 chunks_number = int(X_test.shape[0] / 100)
 
-X_test_chunks = np.array(np.split(X_test, chunks_number))
-Y_test_chunks = np.array(np.split(Y_test, chunks_number))
+X_test_chunks = np.array(np.array_split(X_test, chunks_number))
+Y_test_chunks = np.array(np.array_split(Y_test, chunks_number))
 
 
 static_mape_errors = np.zeros((REPEAT, chunks_number))
@@ -30,7 +32,11 @@ dynamic_mape_errors = np.zeros((REPEAT, chunks_number))
 
 for i in range(REPEAT):
     # without re-fit
-    model = MLPRegressor()
+    model = Sequential()
+    model.add(Dense(100))
+    model.add(Dense(Y_test.shape[1]))
+    model.compile(loss='mean_squared_error', optimizer='adam')
+
     model.fit(X_train, Y_train)
 
     for c in range(chunks_number):
