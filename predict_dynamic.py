@@ -45,15 +45,18 @@ for i in range(REPEAT):
             Y_test_chunks[c], prediction)
 
     # with re-fit
-    model = MLPRegressor()
-    model.partial_fit(X_train, Y_train)
+    model = Sequential()
+    model.add(Dense(100))
+    model.add(Dense(Y_test.shape[1]))
+    model.compile(loss='mean_squared_error', optimizer='adam')
+    model.fit(X_train, Y_train)
 
     for c in range(chunks_number):
         prediction = model.predict(X_test_chunks[c])
         dynamic_mape_errors[i, c] = mean_absolute_percentage_error(
             Y_test_chunks[c], prediction)
 
-        model.partial_fit(X_test_chunks[c], Y_test_chunks[c])
+        model.fit(X_test_chunks[c], Y_test_chunks[c])
 
     print('RUN: ', i + 1, ' - static mean: ', static_mape_errors[i].mean())
     print('RUN: ', i + 1, ' - dynamic mean: ', dynamic_mape_errors[i].mean())
