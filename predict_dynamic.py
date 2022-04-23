@@ -21,7 +21,8 @@ Y_test = Y[failure_time:, :]
 # Y_train = np.ravel(Y_train)
 # Y_test = np.ravel(Y_test)
 
-chunks_number = int(X_test.shape[0] / 100)
+chunk_size = 100
+chunks_number = int(X_test.shape[0] / chunk_size)
 
 X_test_chunks = np.array(np.array_split(X_test, chunks_number))
 Y_test_chunks = np.array(np.array_split(Y_test, chunks_number))
@@ -29,6 +30,9 @@ Y_test_chunks = np.array(np.array_split(Y_test, chunks_number))
 
 static_mape_errors = np.zeros((REPEAT, chunks_number))
 dynamic_mape_errors = np.zeros((REPEAT, chunks_number))
+
+static_single_errors = np.zeros((10, X_test.shape[0]))
+dynamic_single_errors = np.zeros((10, X_test.shape[0]))
 
 for i in range(REPEAT):
     # without re-fit
@@ -41,6 +45,9 @@ for i in range(REPEAT):
 
     for c in range(chunks_number):
         prediction = model.predict(X_test_chunks[c])
+        for j in range(len(prediction)):
+            static_single_errors[i, c * chunk_size + j] = mean_absolute_percentage_error(Y_test_chunks[c][j],
+                                                                                          prediction[j])
         static_mape_errors[i, c] = mean_absolute_percentage_error(
             Y_test_chunks[c], prediction)
 
@@ -53,6 +60,8 @@ for i in range(REPEAT):
 
     for c in range(chunks_number):
         prediction = model.predict(X_test_chunks[c])
+        for j in range(len(prediction)):
+            dynamic_single_errors[i, c*chunk_size+j] = mean_absolute_percentage_error(Y_test_chunks[c][j], prediction[j])
         dynamic_mape_errors[i, c] = mean_absolute_percentage_error(
             Y_test_chunks[c], prediction)
 
@@ -63,3 +72,6 @@ for i in range(REPEAT):
 
 np.save("static_MAPE.npy", static_mape_errors)
 np.save("dynamic_MAPE.npy", dynamic_mape_errors)
+
+np.save("static_single.npy", static_single_errors)
+np.save("dynamic_single.npy", dynamic_single_errors)
