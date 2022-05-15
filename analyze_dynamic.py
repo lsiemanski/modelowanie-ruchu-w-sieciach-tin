@@ -14,8 +14,8 @@ dynamic_mape_errors = np.load("dynamic_MAPE.npy")
 static_mape_errors = np.mean(static_mape_errors, axis=0)
 dynamic_mape_errors = np.mean(dynamic_mape_errors, axis=0)
 
-# print(np.mean(static_mape_errors))
-# print(np.mean(dynamic_mape_errors))
+print(np.mean(static_mape_errors))
+print(np.mean(dynamic_mape_errors))
 
 static_mape_errors = moving_average(static_mape_errors, n=20)
 dynamic_mape_errors = moving_average(dynamic_mape_errors, n=20)
